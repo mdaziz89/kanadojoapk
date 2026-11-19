@@ -60,7 +60,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;o
 .tonal:disabled{opacity:.5}
 
 /* flashcard */
-.stage{position:relative;flex:1;display:flex;min-height:300px}
+.stage{position:relative;flex:1;display:flex;min-height:230px}
 .card{flex:1;background:var(--surface);border:2px solid transparent;border-radius:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:20px 14px;text-align:center;transition:border-color .2s,box-shadow .25s}
 .card.good{border-color:var(--good);box-shadow:0 0 0 6px color-mix(in srgb,var(--good) 22%,transparent)}
 .card.bad{border-color:var(--bad);animation:shake .35s}
@@ -69,9 +69,9 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;o
 .pill{padding:3px 10px;border-radius:8px;font-size:12px;font-weight:700;background:var(--surface2);color:var(--fg)}
 .pill.new{background:var(--accent);color:var(--accent-fg)}
 .pill.weak{background:var(--bad);color:var(--on-bad)}
-.glyph{font:500 clamp(96px,30vw,168px)/1.1 var(--font)}
-.answer{min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-.romaji{font:700 52px/1 var(--font);color:var(--accent)}
+.glyph{font:500 clamp(64px,min(21vw,14vh),112px)/1.1 var(--font)}
+.answer{min-height:92px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+.romaji{font:700 42px/1 var(--font);color:var(--accent)}
 .hint{color:var(--muted);font-size:14px}
 .speed{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
 .replay{background:var(--container);color:var(--on-container);border-radius:100px;padding:7px 16px;font-weight:600;font-size:13px;margin-top:2px}
@@ -85,7 +85,7 @@ main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;o
 .actionbar{position:sticky;bottom:0;margin:0 -16px -24px;padding:10px 16px 16px;background:linear-gradient(to top,var(--bg) 78%,transparent)}
 .actions{display:grid;gap:12px;grid-template-columns:1fr}
 .actions.two{grid-template-columns:1fr 1fr}
-.btn{border-radius:100px;padding:18px 12px;font-weight:700;font-size:17px;display:flex;flex-direction:column;align-items:center;gap:1px;transition:transform .1s,filter .1s}
+.btn{border-radius:100px;padding:15px 12px;font-weight:700;font-size:17px;display:flex;flex-direction:column;align-items:center;gap:1px;transition:transform .1s,filter .1s}
 .btn:active{transform:scale(.97);filter:brightness(.92)}
 .btn small{display:none}
 .btn.reveal{background:var(--accent);color:var(--accent-fg)}
@@ -370,7 +370,14 @@ function floatText(t,crit){var e=document.createElement("div");e.className="floa
 var voice=null;
 function pickVoice(){try{var v=speechSynthesis.getVoices();voice=v.filter(function(x){return /^ja/i.test(x.lang);})[0]||null;}catch(e){}}
 if("speechSynthesis" in window){pickVoice();speechSynthesis.onvoiceschanged=pickVoice;}
-function say(text){if(!S.set.snd||!("speechSynthesis" in window))return;
+var warned=false;
+function say(text){if(!S.set.snd)return;
+  // Android app: native text-to-speech (WebView has no speechSynthesis voices)
+  try{if(window.AndroidTTS){
+    var st=AndroidTTS.status();
+    if(st==="nojapanese"&&!warned){warned=true;toast("No Japanese voice found. Phone Settings > Text-to-speech > install Japanese.");}
+    AndroidTTS.speak(text);return;}}catch(e){}
+  if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang="ja-JP";if(voice)u.voice=voice;u.rate=0.8;speechSynthesis.speak(u);}catch(e){}}
 
 
