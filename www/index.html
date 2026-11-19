@@ -214,6 +214,11 @@ canvas#fx{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-in
         <h3>How the schedule works</h3>
         <div class="how">Every card sits in a box. Recall it and it moves up: it returns after 10 minutes, 1 day, 3 days, 1 week, 2 weeks, 1 month, then 3 months. Miss it and it drops to the start and comes back within a few cards, again a little later, and more often than the others until it sticks. New cards arrive a few at a time so reviews never pile up. The app also times how long you take to recall each letter. A correct answer after a long pause counts as shaky: it moves up less, comes back sooner, and shows up more, until you can read it fast. Amber dots on the map mark those letters. Come back daily; short sessions beat long ones.</div>
       </div>
+      <div class="panel">
+        <h3>Voice test</h3>
+        <div class="how" id="voiceInfo">Tap the button to hear a test and see the voice status.</div>
+        <button class="tonal" id="voiceTest">🔊 Test Japanese voice</button>
+      </div>
       <button class="reset" id="resetBtn">Reset all progress</button>
     </section>
   </main>
@@ -375,7 +380,7 @@ function say(text){if(!S.set.snd)return;
   // Android app: native text-to-speech (WebView has no speechSynthesis voices)
   try{if(window.AndroidTTS){
     var st=AndroidTTS.status();
-    if(st==="nojapanese"&&!warned){warned=true;toast("No Japanese voice found. Phone Settings > Text-to-speech > install Japanese.");}
+    if(st!=="ok"&&st!=="loading"&&!warned){warned=true;toast("Voice problem: "+AndroidTTS.info()+". Check Settings > Text-to-speech.");}
     AndroidTTS.speak(text);return;}}catch(e){}
   if(!("speechSynthesis" in window))return;
   try{speechSynthesis.cancel();var u=new SpeechSynthesisUtterance(text);u.lang="ja-JP";if(voice)u.voice=voice;u.rate=0.8;speechSynthesis.speak(u);}catch(e){}}
@@ -491,6 +496,9 @@ function endRound(){clearInterval(ROUND.h);var sc=ROUND.score;ROUND.on=false;$("
   BADGES.forEach(function(b){if(!S.badges[b.id]&&b.t())S.badges[b.id]=1;});
   save();render();}
 $("roundBtn").onclick=startRound;
+$("voiceTest").onclick=function(){var i=$("voiceInfo");
+  if(window.AndroidTTS){try{say("あ");setTimeout(function(){i.textContent="Android voice: "+AndroidTTS.info();},700);}catch(e){i.textContent="Bridge error: "+e;}}
+  else{i.textContent="Browser voice: "+(("speechSynthesis" in window)?(voice?"ja voice found":"no ja voice"):"not supported");say("あ");}};
 var armed=false;
 $("resetBtn").onclick=function(){
   if(!armed){armed=true;this.textContent="Tap again to erase everything";var b=this;setTimeout(function(){armed=false;b.textContent="Reset all progress";},3500);return;}
