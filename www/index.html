@@ -498,7 +498,7 @@ function endRound(){clearInterval(ROUND.h);var sc=ROUND.score;ROUND.on=false;$("
 $("roundBtn").onclick=startRound;
 $("voiceTest").onclick=function(){var i=$("voiceInfo");
   if(window.AndroidTTS){try{say("あ");setTimeout(function(){i.textContent="Android voice: "+AndroidTTS.info();},700);}catch(e){i.textContent="Bridge error: "+e;}}
-  else{i.textContent="Browser voice: "+(("speechSynthesis" in window)?(voice?"ja voice found":"no ja voice"):"not supported");say("あ");}};
+  else{i.textContent="Native voice bridge NOT found (AndroidTTS missing). Browser voice: "+(("speechSynthesis" in window)?(voice?"ja voice found":"no ja voice"):"not supported");say("あ");}};
 var armed=false;
 $("resetBtn").onclick=function(){
   if(!armed){armed=true;this.textContent="Tap again to erase everything";var b=this;setTimeout(function(){armed=false;b.textContent="Reset all progress";},3500);return;}
